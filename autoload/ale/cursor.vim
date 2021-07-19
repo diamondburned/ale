@@ -26,28 +26,18 @@ function! ale#cursor#TruncatedEcho(original_message) abort
         " The message is truncated and saved to the history.
         silent! setlocal shortmess+=T
 
-        try
-            exec "norm! :echomsg l:message\n"
-        catch /^Vim\%((\a\+)\)\=:E523/
-            " Fallback into manual truncate (#1987)
-            let l:winwidth = winwidth(0)
+		try
+        	exec "norm! :echomsg l:message\n"
 
-            if l:winwidth < strdisplaywidth(l:message)
-                " Truncate message longer than window width with trailing '...'
-                let l:message = l:message[:l:winwidth - 4] . '...'
-            endif
-
-            exec 'echomsg l:message'
-        catch /E481/
-            " Do nothing if running from a visual selection.
-        endtry
-
-        " Reset the cursor position if we moved off the end of the line.
-        " Using :norm and :echomsg can move the cursor off the end of the
-        " line.
-        if l:cursor_position != getpos('.')
-            call setpos('.', l:cursor_position)
-        endif
+	        " Reset the cursor position if we moved off the end of the line.
+	        " Using :norm and :echomsg can move the cursor off the end of the
+	        " line.
+	        if l:cursor_position != getpos('.')
+	            call setpos('.', l:cursor_position)
+	        endif
+		catch
+			" noop
+		endtry
     finally
         let &l:shortmess = l:shortmess_options
     endtry
